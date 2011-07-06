@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <script type="text/javascript" src="vendor/underscore/underscore_1.1.6-min.js"></script>
+        <script type="text/javascript" src="vendor/jquery/jquery-1.6.1.min.js"></script>
+        <script type="text/javascript" src="vendor/neon.js"></script>
+        <script type="text/javascript" src="vendor/custom_event.js"></script>
+        <script type="text/javascript" src="vendor/custom_event_support.js"></script>
+        <script type="text/javascript" src="radium.js"></script>
+        <script type="text/javascript">
+            var X = new Radium.State({
+                code: function(x) {
+                    console.log("In X, received", x);
+                    return "[" + x + "]";
+                },
+                name: 'X'
+            });
+
+            var Y = new Radium.State({
+                code: function(y) {
+                    console.log("In Y, received", y);
+                    return "{" + y + "}";
+                },
+                name: 'Y'
+            });
+            var A = new Radium.State({
+                code: function(a) {
+                    console.log("In A, received", a);
+                    return this.waitFor(X, Y, function(fromX, fromY) {
+                        return "(" + a + ',' + fromX + ',' + fromY + ")";
+                    });
+                },
+                name: 'A'
+            });
+            var B = new Radium.State({
+                code: function(b) {
+                    console.log("In B, received", b);
+                    return "<" + b + ">";
+                },
+                name: 'B'
+            });
+
+            var C = new Radium.State({
+                requirements: [A, B],
+                code: function(fromA, fromB) {
+                    console.log("In C, received", fromA, fromB);
+                    return "≤" + fromA + ',' + fromB + "≥";
+                },
+                name: 'C'
+            });
+
+            A.runCode('a');
+            X.runCode('x');
+            Y.runCode('y');
+            B.runCode('b');
+
+        </script>
+    </head>
+    <body>
+
+    </body>
+</html>
