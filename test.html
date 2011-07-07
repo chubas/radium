@@ -1,12 +1,130 @@
 <html>
     <head>
-        <script type="text/javascript" src="vendor/underscore/underscore_1.1.6-min.js"></script>
         <script type="text/javascript" src="vendor/jquery/jquery-1.6.1.min.js"></script>
         <script type="text/javascript" src="vendor/neon.js"></script>
         <script type="text/javascript" src="vendor/custom_event.js"></script>
         <script type="text/javascript" src="vendor/custom_event_support.js"></script>
         <script type="text/javascript" src="radium.js"></script>
         <script type="text/javascript">
+
+            console.log(new Date());
+            var Sm = new Samarium.Manager();
+
+            Sm.link($(document).ready ,'Dom:Ready');
+            
+            Sm.on('Dom:Ready').then(function(){
+                console.log('Dom is ready')
+                //Sm.link($('#button'), 'click' ,'Dom:Ready');
+                //Sm.link($(window).resize  ,'Dom:Resize');
+            });
+
+            Sm.on('Dom:loaded', 'Page:loaded','Field:loaded').then(function(){
+                console.log('Events Resolved','Dom:loaded', 'Page:loaded','Field:loaded');
+            })
+
+            Sm.on('Dom:loaded', 'Page:loaded','Field:loaded').setName('BigLoader').each(function(e){
+                console.log('Resolved',e.type);
+            }).then(function(){
+                console.log('Event after Dom:loaded, Page:loaded, Field:loaded');
+            });
+
+            Sm.on('Elastic:Initialize').then(function(){
+                console.log('More functions after Elastic:Initialize');
+            });
+
+            Sm.on('BigLoader:Completed','Elastic:Initialize').then(function(){
+                console.log('Everything finished');
+                var elasticSm = Sm.get('Elastic');
+                elasticSm.trigger('Reset');
+
+                var delayed = Sm.on('Dom:loaded','Elastic:Initialize').then(function(){
+                    console.log('*** Really delayed event');
+                });
+
+                delayed.then(function(){
+                    console.log('*** Even more delayed event');
+                });
+            });
+
+            Sm.once('Elastic:Reset').then(function(){
+                console.log('Reseting Elastic');
+            });
+
+            console.log('----  Is Dom loaded',Sm.is('Dom:loaded'));
+
+            $(document).ready(function(){
+                var domSm = Sm.get('Dom');
+                domSm.unique('loaded',{mesage:'message',moreData:'need more cowbell'});
+                setTimeout(function(){
+                    var elasticSm = Sm.get('Elastic');
+                    elasticSm.unique('Initialize');                    
+                    elasticSm.trigger('Reset');                    
+                },200);
+
+                console.log('----  Is Dom loaded',Sm.is('Dom:loaded'));
+            });
+
+            setTimeout(function(){
+                var pageSm = Sm.get('Page');
+                pageSm.unique('loaded');
+            }, 1000);
+
+            setTimeout(function(){
+                var fieldSm = Sm.get('Field');
+                fieldSm.unique('loaded');                
+            }, 1500);
+
+
+
+/*
+            setTimeout(function(){
+                var pageSm = Sm.get('Field');
+                pageSm.dispatch('loaded');
+            }, 1500);
+*/
+                        
+
+/*
+            var StateMachine = new Radium.StateMachine({
+                states : {
+                    Created     : function(){console.log('widget created')},
+                    Rendered    : function(){console.log('rendered created')},
+                    Binded      : function(){console.log('bindings created')},
+                }
+            });
+
+            var OtherStateMachine = new Radium.StateMachine({
+                states : {
+                    Created     : function(){console.log('other widget created')},
+                    Rendered    : function(){console.log('other rendered created')},
+                    Binded      : function(){console.log('other bindings created')},
+                }
+            });            
+
+            var FinalStateMachine = new Radium.StateMachine({
+                states: {
+                    Start   : function(data){
+                        console.log('FinalStateMaching started',data)
+                    },
+                    Complete : function(){
+                        console.log('FinalStateMaching is completed')
+                    }
+                },
+                bindings : {
+                    Start    : StateMachine.afterCreated,
+                    Complete : [StateMachine.afterCreated, StateMachine.afterRendered]
+                }
+            });
+            
+
+
+            StateMachine.Created();
+            OtherStateMachine.Rendered();
+*/            
+                       
+
+
+/*
             var X = new Radium.State({
                 code: function(x) {
                     console.log("In X, received", x);
@@ -52,10 +170,10 @@
             X.runCode('x');
             Y.runCode('y');
             B.runCode('b');
-
+*/
         </script>
     </head>
     <body>
-
+        <button id="button">Click Me</button>
     </body>
 </html>

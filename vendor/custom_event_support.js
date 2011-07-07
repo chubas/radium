@@ -57,7 +57,6 @@ Module('CustomEventSupport')({
 		},
 		dispatch : function(type, data){
 			var event, listeners, that, allowDefault;
-			
 			if(!this.eventListeners){
 				this.eventListeners = {};
 			}
