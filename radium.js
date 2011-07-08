@@ -1,6 +1,6 @@
-var Samarium = {}
+var Samarium = {};
 
-Samarium.Promise = Class(Samarium ,'Promise').includes(CustomEventSupport)({
+Class(Samarium ,'Promise').includes(CustomEventSupport)({
     prototype: {
         _events : {},
         _once   : false,//function
@@ -68,7 +68,7 @@ Samarium.Promise = Class(Samarium ,'Promise').includes(CustomEventSupport)({
     }
 });
 
-Samarium.Manager = Class( Samarium , 'Manager').includes(CustomEventSupport)({    
+Class( Samarium , 'Manager').includes(CustomEventSupport)({    
     prototype: {
         _config : {},
         _factories : {},
@@ -153,7 +153,7 @@ Samarium.Manager = Class( Samarium , 'Manager').includes(CustomEventSupport)({
     }
 });
 
-Samarium.StateFactory  = Class( Samarium , 'StateFactory').includes(CustomEventSupport)({
+Class( Samarium , 'StateFactory').includes(CustomEventSupport)({
     prototype: {
         _events : {},
         _name : '',
