@@ -25,14 +25,17 @@ Class(Samarium ,'Promise').includes(CustomEventSupport)({
                 this._each(event);
             };
 
-            if(this.isPromiseCompleted() && typeof this._then === 'function'){
-                this._then();
+            if(this.isPromiseCompleted()){
+                if(typeof this._then === 'function'){
+                    this._then();   
+                }
 
                 if(this._once){
                     this._then = function(){};
                 }
 
                 if(this._name){
+                    console.log('Unique: ',this._name)
                     this._Sm.get(this._name).unique('Completed');
                 }
             }
@@ -83,7 +86,7 @@ Class( Samarium , 'Manager').includes(CustomEventSupport)({
                 return this._factories[name] = SSF;
             }
         },
-        on : function(){
+        after : function(){
             var self = this;
             var events = this.buildEvents(arguments);
             var dfd = new Samarium.Promise({
@@ -129,12 +132,18 @@ Class( Samarium , 'Manager').includes(CustomEventSupport)({
 
             return e;
         },
-        link : function(event, eventName){
+        link : function(event, eventName, isUnique){
+            console.log(event, eventName, isUnique);
             var self = this;
             var en = eventName.split(':');
+            var SSF = self.get(en[0]);
+
             event(function(e){
-                self.get(en[0]).trigger(en[1],e);
-                //console.log('Linking',e,en)
+                if(isUnique == undefined || isUnique == true){
+                    SSF.unique(en[1],e);
+                }else{
+                    SSF.trigger(en[1],e);
+                }
             });
             return this;
         },

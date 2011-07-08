@@ -12,32 +12,41 @@
 
             Sm.link($(document).ready ,'Dom:Ready');
             
-            Sm.on('Dom:Ready').then(function(){
+            Sm.after('Dom:Ready').then(function(){
                 console.log('Dom is ready')
                 //Sm.link($('#button'), 'click' ,'Dom:Ready');
                 //Sm.link($(window).resize  ,'Dom:Resize');
             });
 
-            Sm.on('Dom:loaded', 'Page:loaded','Field:loaded').then(function(){
+            Sm.after('Dom:loaded', 'Page:loaded','Field:loaded').then(function(){
                 console.log('Events Resolved','Dom:loaded', 'Page:loaded','Field:loaded');
             })
 
-            Sm.on('Dom:loaded', 'Page:loaded','Field:loaded').setName('BigLoader').each(function(e){
+            Sm.after('Dom:loaded', 'Page:loaded','Field:loaded').setName('BigLoader').each(function(e){
                 console.log('Resolved',e.type);
             }).then(function(){
                 console.log('Event after Dom:loaded, Page:loaded, Field:loaded');
             });
 
-            Sm.on('Elastic:Initialize').then(function(){
+            
+
+            var RepatedDef = Sm.after('Dom:loaded', 'Page:loaded','Field:loaded').setName('RepatedLoader')
+            var RepatedListener = Sm.after('RepatedLoader:Completed').then(function(){
+                console.log('/////RepatedLoader is completed');
+            })
+
+
+
+            Sm.after('Elastic:Initialize').then(function(){
                 console.log('More functions after Elastic:Initialize');
             });
 
-            Sm.on('BigLoader:Completed','Elastic:Initialize').then(function(){
+            Sm.after('BigLoader:Completed','Elastic:Initialize').then(function(){
                 console.log('Everything finished');
                 var elasticSm = Sm.get('Elastic');
                 elasticSm.trigger('Reset');
 
-                var delayed = Sm.on('Dom:loaded','Elastic:Initialize').then(function(){
+                var delayed = Sm.after('Dom:loaded','Elastic:Initialize').then(function(){
                     console.log('*** Really delayed event');
                 });
 
@@ -58,7 +67,7 @@
                 setTimeout(function(){
                     var elasticSm = Sm.get('Elastic');
                     elasticSm.unique('Initialize');                    
-                    elasticSm.trigger('Reset');                    
+                    elasticSm.trigger('Reset');
                 },200);
 
                 console.log('----  Is Dom loaded',Sm.is('Dom:loaded'));
