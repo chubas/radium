@@ -6,18 +6,20 @@ Class(Samarium ,'Promise').includes(CustomEventSupport)({
         _once   : false,//function
         _each   : null,//function
         _then   : null,//function
+        _data   : {},
         init : function(options,Sm){
             this._events = options.events;
-            this._once = options.once || false,
-            this._then = null,
-            this._each = null,
+            this._once = options.once || false;
+            this._then = null;
+            this._each = null;
+            this._data = {};
             this._Sm = Sm;
-
-
         },
         resolve : function(){
             var event = arguments[1];
             event.type = arguments[0];
+
+            this._data[event.type] = event;
 
             this._events[event.type].status = 'resolved';    
 
@@ -27,7 +29,7 @@ Class(Samarium ,'Promise').includes(CustomEventSupport)({
 
             if(this.isPromiseCompleted()){
                 if(typeof this._then === 'function'){
-                    this._then();   
+                    this._then(this._data);   
                 }
 
                 if(this._once){
@@ -133,7 +135,6 @@ Class( Samarium , 'Manager').includes(CustomEventSupport)({
             return e;
         },
         link : function(event, eventName, isUnique){
-            console.log(event, eventName, isUnique);
             var self = this;
             var en = eventName.split(':');
             var SSF = self.get(en[0]);
@@ -164,39 +165,48 @@ Class( Samarium , 'Manager').includes(CustomEventSupport)({
 
 Class( Samarium , 'StateFactory').includes(CustomEventSupport)({
     prototype: {
-        _events : {},
+        _states : {},
         _name : '',
         init : function(name){
-            this._events = {};
+            this._states = {};
             this._name = name || '';
         },
-        unique : function(eventName,data){
-            this.addEvent(eventName);
-            this.setAsUnique(eventName);
-            this.dispatch(eventName,data);         
+        unique : function(stateName,data){
+            this.addEvent(stateName);
+            this.setAsUnique(stateName);
+            this.dispatch(stateName,data);         
         },
-        trigger : function(eventName,data){
-            this.addEvent(eventName);
-            this.dispatch(eventName,data);
+        set     : function(stateName,status,data){
+            console.log(stateName,status);
+            this.addEvent(stateName);
+            this._states[stateName] = status;
+            this.dispatch(stateName,{status:status,data:data});
         },
-        addEvent : function(eventName){
-            if( !this._events[eventName]){
-                this._events[eventName] = {
+        get     : function(stateName){
+            console.log('getting',stateName);
+            return this._states[stateName];
+        },
+        trigger : function(stateName,data){
+            this.addEvent(stateName);
+            this.dispatch(stateName,data);
+        },
+        addEvent : function(stateName){
+            if( !this._states[stateName]){
+                this._states[stateName] = {
                     isUnique : false,
-                    times : 0
+                    state : ''
                 }
-            }else{
-                this._events[eventName].times++;
             }
         },
-        setAsUnique : function(eventName){
-            this._events[eventName].isUnique = true;
+        setAsUnique : function(stateName){
+            this._states[stateName].isUnique = true;
+            this._states[stateName].state = 'unique';
         },
-        isUnique : function(eventName){
-            return this._events[eventName] && this._events[eventName].isUnique;
+        isUnique : function(stateName){
+            return this._states[stateName] && this._states[stateName].isUnique;
         },
         status : function(){
-            return $.extend(true, {}, this._events);
+            return $.extend(true, {}, this._states);
         }
     }
 })

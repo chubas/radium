@@ -11,9 +11,15 @@
             var Sm = new Samarium.Manager();
 
             Sm.link($(document).ready ,'Dom:Ready');
-            
+            Sm.after('Shelf:working').then(function(data){
+                console.log('*** Shelf working?', data["Shelf:working"].status); 
+            });
+
+            Sm.get('Shelf').set('working','off');
+
             Sm.after('Dom:Ready').then(function(){
-                console.log('Dom is ready')
+                console.log('Dom is ready');
+                Sm.get('Shelf').set('working','on');
                 //Sm.link($('#button'), 'click' ,'Dom:Ready');
                 //Sm.link($(window).resize  ,'Dom:Resize');
             });
